@@ -32,7 +32,7 @@ public class AutomatoPilha
 
         transicoes.Add(("q0", 'a', 'a'), ("q0", "aa")); // lê 'a' -> desempilha 'a' -> q0 -> empilha 'a' e 'a'
 
-        transicoes.Add(("q0", 'b', 'a'), ("q0", "")); // lê 'b' -> desempilha 'a' -> q0 -> não empilha nada
+        transicoes.Add(("q0", 'b', 'a'), ("q1", "")); // lê 'b' -> desempilha 'a' -> q1 -> não empilha nada
 
         transicoes.Add(("q1", 'b', 'a'), ("q1", "")); // lê 'b' -> desempilha 'a' -> q1 -> não empilha nada
 
