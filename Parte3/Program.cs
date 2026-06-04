@@ -2,6 +2,7 @@ using Parte3;
 
 PrintHeader();
 RunL4Tests();
+RunIncrementerTests();
 
 static void PrintHeader()
 {
@@ -86,6 +87,45 @@ static TuringMachine BuildL4Recognizer()
         { ("q4", 'Y'), ("q4", 'Y', 'R') },
         { ("q4", 'Z'), ("q4", 'Z', 'R') },
         { ("q4", '_'), ("qaccept", '_', 'R') },
+    };
+
+    return new TuringMachine(t, "q0", "qaccept", "qreject");
+}
+
+static void RunIncrementerTests()
+{
+    Console.WriteLine("--- MT 2: Incrementador Unario f(n) = n + 1 ---");
+    Console.WriteLine();
+
+    var mt = BuildUnaryIncrementer();
+
+    var cases = new (string Input, int ExpectedOnes)[]
+    {
+        ("1",    2),
+        ("11",   3),
+        ("111",  4),
+        ("1111", 5),
+        ("",     1),
+    };
+
+    foreach (var (input, expectedOnes) in cases)
+    {
+        var display = input.Length == 0 ? "(vazio)" : input;
+        var result = mt.Run(input);
+        var actualOnes = result.FinalTapeContent.Count(c => c == '1');
+        var ok = actualOnes == expectedOnes ? "[OK]  " : "[FAIL]";
+        Console.WriteLine($"{ok} f({input.Length}) = {actualOnes}  fita: [{result.FinalTapeContent}]  ({result.StepsExecuted} passos)");
+    }
+
+    Console.WriteLine();
+}
+
+static TuringMachine BuildUnaryIncrementer()
+{
+    var t = new Dictionary<(string, char), (string, char, char)>
+    {
+        { ("q0", '1'), ("q0", '1', 'R') },
+        { ("q0", '_'), ("qaccept", '1', 'R') },
     };
 
     return new TuringMachine(t, "q0", "qaccept", "qreject");
