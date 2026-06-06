@@ -36,22 +36,39 @@ public class AutomatoPilha
 
         transicoes.Add(("q1", 'b', 'a'), ("q1", "")); // lê 'b' -> desempilha 'a' -> q1 -> não empilha nada
 
-        transicoes.Add(("q1", 'E', 'Z'), ("q1", "")); // lê 'E' (vazio) -> desempilha 'Z' -> q1 -> não empilha nada
+        transicoes.Add(("q1", '\0', 'Z'), ("q1", "")); // lê \0' (vazio) -> desempilha 'Z' -> q1 -> não empilha nada
     }
 
     public bool Simular(String entrada)
     {
+        if(String.IsNullOrEmpty(entrada))
+        {
+            Console.WriteLine("ERRO: Entrada vazia.");
+            return false;
+        }
+
+        foreach(char simbolo in entrada)
+        {
+            if(!Entrada.Contains(simbolo))
+            {
+                Console.WriteLine($"ERRO: entrada contém símbolo inválido.");
+                return false; // Se a entrada contiver um símbolo inválido, a entrada não é aceita
+            }
+        }
 
         pilha.Clear();
         pilha.Push(SimboloInicial); // Empilha o símbolo inicial da pilha
         string estadoAtual = EstadoInicial;
+
+        Console.WriteLine($"\nSimulando: {entrada}");
+        ExibirConfig(estadoAtual, entrada);
 
         Queue<char> filaEntrada = new Queue<char>(entrada);
 
         while (filaEntrada.Count > 0)
         {
             char simboloEntrada = filaEntrada.Dequeue();
-            
+
             if(pilha.Count == 0)
             {
                 return false; // Se a pilha estiver vazia, a entrada não é aceita
@@ -68,6 +85,7 @@ public class AutomatoPilha
                 {
                     pilha.Push(empilhar[i]); // Empilha os símbolos na ordem correta
                 }
+                ExibirConfig(estadoAtual, new string(filaEntrada.ToArray()));
             }
             else
             {
@@ -77,13 +95,14 @@ public class AutomatoPilha
            
         }
 
-        if(pilha.Count > 0)
+        if(filaEntrada.Count == 0 && pilha.Count > 0)
         {
             // Verifica se é possível aceitar a entrada por vazio
             char topo = pilha.Pop();
-            if(transicoes.TryGetValue((estadoAtual, 'E', topo), out var transicao))
+            if(transicoes.TryGetValue((estadoAtual, '\0', topo), out var transicao))
             {
                 estadoAtual = transicao.Item1;
+                ExibirConfig(estadoAtual, "\0");
             }
             else
             {
@@ -91,8 +110,16 @@ public class AutomatoPilha
             }
         }
         
-        bool aceita = pilha.Count == 0; // Aceita se a pilha estiver vazia no final da simulação
+        bool aceita = filaEntrada.Count == 0 && pilha.Count == 0; // Aceita se a pilha estiver vazia no final da simulação
         Console.WriteLine(aceita ? "Entrada aceita!" : "Entrada rejeitada!");
         return aceita;
+    }
+
+    private void ExibirConfig(string estado, string entradaRestante){
+
+        string conteudo = pilha.Count > 0 ? string.Join("", pilha.ToArray()) : "vazia";
+        string entradaFormat = string.IsNullOrEmpty(entradaRestante) ? "E" : entradaRestante;
+
+        Console.WriteLine($"Estado: {estado}, Entrada: {entradaFormat}, Conteúdo da Pilha: {conteudo}");
     }
 }
