@@ -47,6 +47,15 @@ public class AutomatoPilha
             return false;
         }
 
+        foreach(char simbolo in entrada)
+        {
+            if(!Entrada.Contains(simbolo))
+            {
+                Console.WriteLine($"ERRO: entrada contém símbolo inválido.");
+                return false; // Se a entrada contiver um símbolo inválido, a entrada não é aceita
+            }
+        }
+
         pilha.Clear();
         pilha.Push(SimboloInicial); // Empilha o símbolo inicial da pilha
         string estadoAtual = EstadoInicial;
@@ -59,12 +68,7 @@ public class AutomatoPilha
         while (filaEntrada.Count > 0)
         {
             char simboloEntrada = filaEntrada.Dequeue();
-            
-            if(!Entrada.Contains(simboloEntrada))
-            {
-                Console.WriteLine($"ERRO: Símbolo '{simboloEntrada}' não pertence ao alfabeto de entrada.");
-                return false; // Se o símbolo de entrada não for válido, a entrada não é aceita
-            }
+
             if(pilha.Count == 0)
             {
                 return false; // Se a pilha estiver vazia, a entrada não é aceita
@@ -91,7 +95,7 @@ public class AutomatoPilha
            
         }
 
-        if(pilha.Count > 0)
+        if(filaEntrada.Count == 0 && pilha.Count > 0)
         {
             // Verifica se é possível aceitar a entrada por vazio
             char topo = pilha.Pop();
@@ -106,7 +110,7 @@ public class AutomatoPilha
             }
         }
         
-        bool aceita = pilha.Count == 0; // Aceita se a pilha estiver vazia no final da simulação
+        bool aceita = filaEntrada.Count == 0 && pilha.Count == 0; // Aceita se a pilha estiver vazia no final da simulação
         Console.WriteLine(aceita ? "Entrada aceita!" : "Entrada rejeitada!");
         return aceita;
     }
