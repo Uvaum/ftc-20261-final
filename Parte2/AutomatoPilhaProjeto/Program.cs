@@ -7,6 +7,20 @@ class Program
     {
         AutomatoPilha automato = new AutomatoPilha();
 
-        automato.Simular("aaabbb");
+        string caminhoArquivo = "entradas_ap.txt";
+
+        if (File.Exists(caminhoArquivo))
+        {
+            string[] linhas = File.ReadAllLines(caminhoArquivo);
+            foreach (string linha in linhas)
+            {
+                string entrada = linha.Trim(); // Remove espaços em branco caso existam no arquivo
+                automato.Simular(entrada);
+            }
+        }
+        else
+        {
+            Console.WriteLine("Arquivo 'entradas_ap.txt' não encontrado na raiz do projeto.");
+        }
     }
 }
