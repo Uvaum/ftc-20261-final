@@ -41,6 +41,11 @@ public class AutomatoPilha
 
     public bool Simular(String entrada)
     {
+        if(String.IsNullOrEmpty(entrada))
+        {
+            Console.WriteLine("ERRO: Entrada vazia.");
+            return false;
+        }
 
         pilha.Clear();
         pilha.Push(SimboloInicial); // Empilha o símbolo inicial da pilha
@@ -55,6 +60,11 @@ public class AutomatoPilha
         {
             char simboloEntrada = filaEntrada.Dequeue();
             
+            if(!Entrada.Contains(simboloEntrada))
+            {
+                Console.WriteLine($"ERRO: Símbolo '{simboloEntrada}' não pertence ao alfabeto de entrada.");
+                return false; // Se o símbolo de entrada não for válido, a entrada não é aceita
+            }
             if(pilha.Count == 0)
             {
                 return false; // Se a pilha estiver vazia, a entrada não é aceita
