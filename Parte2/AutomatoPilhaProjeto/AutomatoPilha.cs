@@ -16,7 +16,20 @@ public class AutomatoPilha
     public AutomatoPilha()
     {
         pilha = new Stack<char>();
-        Estado = new HashSet<string>{"q0", "q1"};
+        transicoes = new Dictionary<(string, char, char), List<(string, string)>>();
+        Estado = new HashSet<string>();
+        Entrada = new HashSet<char>();
+        AlfabetoPilha = new HashSet<char>();
+        EstadoFinal = new HashSet<string>();
+        EstadoInicial = "q0";
+        SimboloInicial = 'Z';
+    }
+
+    public void L2Config()
+    {
+        transicoes.Clear();
+        EstadoInicial = "q0";
+        SimboloInicial = 'Z';
         Entrada = new HashSet<char>{'a', 'b'};
 
         AdicionarTransicao("q0", 'a', 'Z', "q0", "aZ"); // Empilha 'a' sobre 'Z'
