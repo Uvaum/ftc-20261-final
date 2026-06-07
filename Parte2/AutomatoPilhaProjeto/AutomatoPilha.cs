@@ -45,22 +45,34 @@ public class AutomatoPilha
         transicoes.Clear();
         EstadoInicial = "q0";
         SimboloInicial = 'Z';
-        transicoes = new Dictionary<(string, char, char), (string, string)>();
-        EstadoFinal = new HashSet<string>(); // aceita por vazio
-        TransicoesConfig(); // Popula o dicionário de transições
+        Entrada = new HashSet<char>{'a', 'b'};
+        char[] alfabetoPilha = {'a', 'b', 'Z'}; // 'a' e 'b' para empilhar, 'Z' para simbolo inicial da pilha
+
+        foreach(char topo in alfabetoPilha)
+    {
+            AdicionarTransicao("q0", 'a', topo, "q0", "a" + topo); // Empilha 'a' sobre o topo atual
+            AdicionarTransicao("q0", 'b', topo, "q0", "b" + topo); // Empilha 'b' sobre o topo atual
+            AdicionarTransicao("q0", 'a', topo, "q1", topo.ToString()); // Transição para q1 sem empilhar nada (desempilha o topo)
+            AdicionarTransicao("q0", 'b', topo, "q1", topo.ToString()); // Transição para q1 sem empilhar nada (desempilha o topo)
+            AdicionarTransicao("q0", '\0', topo, "q1", topo.ToString()); // Transição para q1 por vazio (desempilha o topo)
+
+        }
+
+        AdicionarTransicao("q1", 'a', 'a', "q1", ""); // Continua desempilhando 'a' ao ler 'a'
+        AdicionarTransicao("q1", 'b', 'b', "q1", ""); // Continua desempilhando 'b' ao ler 'b'
+        AdicionarTransicao("q1", '\0', 'Z', "q1", ""); // Aceita por vazio quando a pilha estiver vazia
+
     }
 
-    private void TransicoesConfig()
+    public void AdicionarTransicao(string estadoAtual, char entrada, char topo, string novoEstado, string empilhar)
     {
-        transicoes.Add(("q0", 'a', 'Z'), ("q0", "aZ")); // lê 'a' -> desempilha 'Z' -> q0 -> empilha 'a' e 'Z'
-
-        transicoes.Add(("q0", 'a', 'a'), ("q0", "aa")); // lê 'a' -> desempilha 'a' -> q0 -> empilha 'a' e 'a'
-
-        transicoes.Add(("q0", 'b', 'a'), ("q1", "")); // lê 'b' -> desempilha 'a' -> q1 -> não empilha nada
-
-        transicoes.Add(("q1", 'b', 'a'), ("q1", "")); // lê 'b' -> desempilha 'a' -> q1 -> não empilha nada
-
-        transicoes.Add(("q1", '\0', 'Z'), ("q1", "")); // lê \0' (vazio) -> desempilha 'Z' -> q1 -> não empilha nada
+        
+        var chave = (estadoAtual, entrada, topo);
+        if (!transicoes.ContainsKey(chave))
+        {
+            transicoes[chave] = new List<(string, string)>();
+        }
+        transicoes[chave].Add((novoEstado, empilhar));
     }
 
     public bool Simular(String entrada)
