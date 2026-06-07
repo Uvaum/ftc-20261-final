@@ -97,65 +97,94 @@ public class AutomatoPilha
         string estadoAtual = EstadoInicial;
 
         Console.WriteLine($"\nSimulando: {entrada}");
-        ExibirConfig(estadoAtual, entrada);
 
-        Queue<char> filaEntrada = new Queue<char>(entrada);
+        Stack<char> pilhaInicial = new Stack<char>();
+        pilhaInicial.Push(SimboloInicial); // Inicia a pilha com o símbolo inicial
 
-        while (filaEntrada.Count > 0)
+        List<string> historico = new List<string>
         {
-            char simboloEntrada = filaEntrada.Dequeue();
-
-            if(pilha.Count == 0)
-            {
-                return false; // Se a pilha estiver vazia, a entrada não é aceita
-            }
-
-            char topo = pilha.Pop(); // Desempilha o topo da pilha
-
-            if(transicoes.TryGetValue((estadoAtual, simboloEntrada, topo), out var transicao))
-            {
-                estadoAtual = transicao.Item1;
-                string empilhar = transicao.Item2;
-
-                for(int i = empilhar.Length - 1; i >= 0; i--)
-                {
-                    pilha.Push(empilhar[i]); // Empilha os símbolos na ordem correta
-                }
-                ExibirConfig(estadoAtual, new string(filaEntrada.ToArray()));
-            }
-            else
-            {
-                pilha.Push(topo);
-                break; // Se não houver transição válida, interrompe a simulação
-            }
-           
-        }
-
-        if(filaEntrada.Count == 0 && pilha.Count > 0)
-        {
-            // Verifica se é possível aceitar a entrada por vazio
-            char topo = pilha.Pop();
-            if(transicoes.TryGetValue((estadoAtual, '\0', topo), out var transicao))
-            {
-                estadoAtual = transicao.Item1;
-                ExibirConfig(estadoAtual, "\0");
-            }
-            else
-            {
-                pilha.Push(topo); // Restaura o topo da pilha se não houver transição por vazio
-            }
-        }
+            $"Estado Inicial: {EstadoInicial}, Entrada: {entrada}, Pilha: {SimboloInicial}"
+        };
         
-        bool aceita = filaEntrada.Count == 0 && pilha.Count == 0; // Aceita se a pilha estiver vazia no final da simulação
+        bool aceita = Explorar(EstadoInicial, entrada, 0, pilhaInicial, historico);
         Console.WriteLine(aceita ? "Entrada aceita!" : "Entrada rejeitada!");
         return aceita;
     }
 
-    private void ExibirConfig(string estado, string entradaRestante){
+    private bool Explorar(string estadoAtual, string cadeia, int indiceEntrada, Stack<char> pilhaAtual, List<string> historico)
+        {
+        // Condição de Aceitação: leu toda a palavra e a pilha esvaziou
+        if(indiceEntrada == cadeia.Length && pilhaAtual.Count == 0)
+        {
+            foreach(var passo in historico)
+            {
+                Console.WriteLine(passo);
+            }
+            return true; 
+        }
 
-        string conteudo = pilha.Count > 0 ? string.Join("", pilha.ToArray()) : "vazia";
-        string entradaFormat = string.IsNullOrEmpty(entradaRestante) ? "E" : entradaRestante;
+        if(pilhaAtual.Count == 0) // Se a pilha esvaziou mas ainda há entrada para ler, essa configuração não é válida
+        {
+            return false; 
+            }
 
-        Console.WriteLine($"Estado: {estado}, Entrada: {entradaFormat}, Conteúdo da Pilha: {conteudo}");
+        char topoPilha = pilhaAtual.Pop(); 
+        string entradaRestante = indiceEntrada < cadeia.Length ? cadeia.Substring(indiceEntrada) : "\0";
+
+        if(indiceEntrada < cadeia.Length)
+        {
+            char simboloEntrada = cadeia[indiceEntrada];
+            if(transicoes.TryGetValue((estadoAtual, simboloEntrada, topoPilha), out var transicoesPossiveis)) // Verifica se há transições possíveis para o símbolo de entrada atual, o estado atual e o topo da pilha
+            {
+                foreach(var (novoEstado, empilhar) in transicoesPossiveis)
+                {
+                    Stack<char> novaPilha = ClonarPilha(pilhaAtual);
+                    EmpilharMultiplos(novaPilha, empilhar);
+
+                    List<string> novoHistorico = new List<string>(historico);
+                    novoHistorico.Add(GerarStringConfig(novoEstado, cadeia.Substring(indiceEntrada + 1), novaPilha));
+
+                    // Chamada recursiva: avança o índice da entrada (+1)
+                    if (Explorar(novoEstado, cadeia, indiceEntrada + 1, novaPilha, novoHistorico)) return true;
+                }
+            }
+        }
+
+        if(transicoes.TryGetValue((estadoAtual, '\0', topoPilha), out var transicoesLambda)) // Verifica se há transições lambda (vazio) para o estado atual e o topo da pilha
+        {
+            foreach(var (novoEstado, empilhar) in transicoesLambda)
+            {
+                Stack<char> novaPilha = ClonarPilha(pilhaAtual);
+                EmpilharMultiplos(novaPilha, empilhar);
+
+                List<string> novoHistorico = new List<string>(historico);
+                novoHistorico.Add(GerarStringConfig(novoEstado, entradaRestante, novaPilha));
+
+                // Chamada recursiva: O índice de entrada NÃO avança
+                if (Explorar(novoEstado, cadeia, indiceEntrada, novaPilha, novoHistorico)) return true;
+            }
+        }
+
+        // Se explorou todas as opções deste nó e nenhuma deu certo, retorna falso (Backtracking)
+        return false;
+    }
+
+    private void EmpilharMultiplos(Stack<char> p, string simbolos)
+    {
+        for (int i = simbolos.Length - 1; i >= 0; i--) p.Push(simbolos[i]);
+    }
+
+    private Stack<char> ClonarPilha(Stack<char> original)
+    {
+        var array = original.ToArray();
+        Array.Reverse(array); // Inverter a array garante que a nova Stack mantenha a ordem do topo original
+        return new Stack<char>(array);
+    }
+
+    private string GerarStringConfig(string estado, string entradaRestante, Stack<char> p)
+    {
+        string conteudo = p.Count > 0 ? string.Join("", p.ToArray()) : "[Vazia]";
+        string entradaFormat = string.IsNullOrEmpty(entradaRestante) || entradaRestante == "\0" ? "λ" : entradaRestante;
+        return $"Estado: {estado}, Entrada: {entradaFormat}, Conteúdo da Pilha: {conteudo}";
     }
 }
