@@ -8,7 +8,7 @@ public class AutomatoPilha
     public HashSet<string> Estado {get; private set;} // q conjunto finito de estados
     public HashSet<char> Entrada {get; private set;} // Σ alfabeto de entrada
     public HashSet<char> AlfabetoPilha {get; private set;} // Γ alfabeto da pilha
-    private Dictionary<(string, char, char), (string, string)> transicoes; // δ função de transição
+    private Dictionary<(string, char, char), List<(string, string)>> transicoes; // δ função de transição
     public string EstadoInicial {get; private set;} // q0 estado inicial
     public char SimboloInicial {get; private set;} // Z0 simbolo inicial da pilha
     public HashSet<string> EstadoFinal {get; private set;} // F estados finais
