@@ -13,6 +13,8 @@ public class AutomatoPilha
     public char SimboloInicial {get; private set;} // Z0 simbolo inicial da pilha
     public HashSet<string> EstadoFinal {get; private set;} // F estados finais
 
+    private List<string> historicoLongo; // Lista para armazenar o histórico completo da simulação (para depuração)
+
     public AutomatoPilha()
     {
         pilha = new Stack<char>();
@@ -79,7 +81,7 @@ public class AutomatoPilha
     {
         if(String.IsNullOrEmpty(entrada))
         {
-            Console.WriteLine("ERRO: Entrada vazia.");
+            Console.WriteLine("ERRO: Linguagem exige tamanho n >= 1.");
             return false;
         }
 
@@ -101,14 +103,29 @@ public class AutomatoPilha
         {
             $"Estado Inicial: {EstadoInicial}, Entrada: {entrada}, Pilha: {SimboloInicial}"
         };
+
+        historicoLongo = new List<string>(); // Limpa o histórico longo para a nova simulação
         
         bool aceita = Explorar(EstadoInicial, entrada, 0, pilhaInicial, historico);
+
+        if (!aceita)
+        {
+            foreach(var passo in historicoLongo)
+            {
+                Console.WriteLine(passo);
+            }
+        }
         Console.WriteLine(aceita ? "Entrada aceita!" : "Entrada rejeitada!");
         return aceita;
     }
 
     private bool Explorar(string estadoAtual, string cadeia, int indiceEntrada, Stack<char> pilhaAtual, List<string> historico)
     {
+
+        if(historico.Count > historicoLongo.Count) // Atualiza o histórico longo apenas se este caminho for mais profundo do que o registrado
+        {
+            historicoLongo = new List<string>(historico);
+        }
         // Condição de Aceitação: leu toda a palavra e a pilha esvaziou
         if(indiceEntrada == cadeia.Length && pilhaAtual.Count == 0)
         {
