@@ -49,7 +49,7 @@ public class AutomatoPilha
         char[] alfabetoPilha = {'a', 'b', 'Z'}; // 'a' e 'b' para empilhar, 'Z' para simbolo inicial da pilha
 
         foreach(char topo in alfabetoPilha)
-    {
+        {
             AdicionarTransicao("q0", 'a', topo, "q0", "a" + topo); // Empilha 'a' sobre o topo atual
             AdicionarTransicao("q0", 'b', topo, "q0", "b" + topo); // Empilha 'b' sobre o topo atual
             AdicionarTransicao("q0", 'a', topo, "q1", topo.ToString()); // Transição para q1 sem empilhar nada (desempilha o topo)
@@ -92,10 +92,6 @@ public class AutomatoPilha
             }
         }
 
-        pilha.Clear();
-        pilha.Push(SimboloInicial); // Empilha o símbolo inicial da pilha
-        string estadoAtual = EstadoInicial;
-
         Console.WriteLine($"\nSimulando: {entrada}");
 
         Stack<char> pilhaInicial = new Stack<char>();
@@ -112,7 +108,7 @@ public class AutomatoPilha
     }
 
     private bool Explorar(string estadoAtual, string cadeia, int indiceEntrada, Stack<char> pilhaAtual, List<string> historico)
-        {
+    {
         // Condição de Aceitação: leu toda a palavra e a pilha esvaziou
         if(indiceEntrada == cadeia.Length && pilhaAtual.Count == 0)
         {
@@ -126,7 +122,7 @@ public class AutomatoPilha
         if(pilhaAtual.Count == 0) // Se a pilha esvaziou mas ainda há entrada para ler, essa configuração não é válida
         {
             return false; 
-            }
+        }
 
         char topoPilha = pilhaAtual.Pop(); 
         string entradaRestante = indiceEntrada < cadeia.Length ? cadeia.Substring(indiceEntrada) : "\0";
