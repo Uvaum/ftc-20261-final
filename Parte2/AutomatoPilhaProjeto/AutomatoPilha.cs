@@ -18,7 +18,18 @@ public class AutomatoPilha
         pilha = new Stack<char>();
         Estado = new HashSet<string>{"q0", "q1"};
         Entrada = new HashSet<char>{'a', 'b'};
-        AlfabetoPilha = new HashSet<char>{'a', 'Z'}; // 'a' para empilhar e 'Z' para simbolo inicial da pilha
+
+        AdicionarTransicao("q0", 'a', 'Z', "q0", "aZ"); // Empilha 'a' sobre 'Z'
+        AdicionarTransicao("q0", 'a', 'a', "q0", "aa"); // Empilha 'a' sobre 'a'
+        AdicionarTransicao("q0", 'b', 'a', "q1", ""); // Desempilha 'a' ao ler 'b'
+        AdicionarTransicao("q1", 'b', 'a', "q1", ""); // Continua desempilhando 'a' ao ler 'b'
+        AdicionarTransicao("q1", '\0', 'Z', "q1", ""); // Aceita por vazio quando a pilha estiver vazia
+
+    }
+
+    public void L3Config()
+    {
+        transicoes.Clear();
         EstadoInicial = "q0";
         SimboloInicial = 'Z';
         transicoes = new Dictionary<(string, char, char), (string, string)>();
