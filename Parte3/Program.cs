@@ -20,6 +20,12 @@ static void RunL4Tests()
 
     var mt = BuildL4Recognizer();
 
+    Console.WriteLine("Trace passo a passo para \"abc\":");
+    mt.Run("abc", (step, state, tape, head) =>
+        Console.WriteLine($"  Passo {step,2} | estado: {state,-9} | cab: {head,2} | fita: {tape}"));
+    Console.WriteLine();
+
+    Console.WriteLine("Resumo dos casos de teste:");
     var cases = new (string Input, bool Expected)[]
     {
         ("abc",       true),
@@ -99,6 +105,12 @@ static void RunIncrementerTests()
 
     var mt = BuildUnaryIncrementer();
 
+    Console.WriteLine("Trace passo a passo para \"111\":");
+    mt.Run("111", (step, state, tape, head) =>
+        Console.WriteLine($"  Passo {step,2} | estado: {state,-9} | cab: {head,2} | fita: {tape}"));
+    Console.WriteLine();
+
+    Console.WriteLine("Resumo dos casos de teste:");
     var cases = new (string Input, int ExpectedOnes)[]
     {
         ("1",    2),

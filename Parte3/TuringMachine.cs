@@ -24,7 +24,8 @@ public sealed class TuringMachine
         _maxSteps = maxSteps;
     }
 
-    public TuringMachineResult Run(string input)
+    // onStep(passo, estado, fita_com_cabecote, posicao_cabecote)
+    public TuringMachineResult Run(string input, Action<int, string, string, int>? onStep = null)
     {
         var tape = LoadTape(input);
         var state = _initialState;
@@ -35,6 +36,8 @@ public sealed class TuringMachine
         {
             if (steps >= _maxSteps)
                 throw new StepLimitExceededException(_maxSteps);
+
+            onStep?.Invoke(steps, state, BuildTapeDisplay(tape, head), head);
 
             var symbol = tape.TryGetValue(head, out var s) ? s : Blank;
 
@@ -51,7 +54,23 @@ public sealed class TuringMachine
             steps++;
         }
 
+        onStep?.Invoke(steps, state, BuildTapeDisplay(tape, head), head);
+
         return new TuringMachineResult(state == _acceptState, steps, BuildTapeSnapshot(tape));
+    }
+
+    private static string BuildTapeDisplay(Dictionary<int, char> tape, int head)
+    {
+        var positions = tape.Keys.Append(head);
+        var min = positions.Min();
+        var max = positions.Max();
+        var result = "";
+        for (var i = min; i <= max; i++)
+        {
+            var c = tape.TryGetValue(i, out var v) ? v : Blank;
+            result += i == head ? $"[{c}]" : c.ToString();
+        }
+        return result;
     }
 
     private static Dictionary<int, char> LoadTape(string input)
