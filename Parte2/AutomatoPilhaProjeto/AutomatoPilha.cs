@@ -4,7 +4,6 @@ using System.Linq;
 
 public class AutomatoPilha
 {
-    private Stack<char> pilha; // Pilha do autômato
     public HashSet<string> Estado {get; private set;} // q conjunto finito de estados
     public HashSet<char> Entrada {get; private set;} // Σ alfabeto de entrada
     public HashSet<char> AlfabetoPilha {get; private set;} // Γ alfabeto da pilha
@@ -17,7 +16,6 @@ public class AutomatoPilha
 
     public AutomatoPilha()
     {
-        pilha = new Stack<char>();
         transicoes = new Dictionary<(string, char, char), List<(string, string)>>();
         Estado = new HashSet<string>();
         Entrada = new HashSet<char>();
@@ -25,6 +23,7 @@ public class AutomatoPilha
         EstadoFinal = new HashSet<string>();
         EstadoInicial = "q0";
         SimboloInicial = 'Z';
+        historicoLongo = new List<string>();
     }
 
     public void L2Config()
