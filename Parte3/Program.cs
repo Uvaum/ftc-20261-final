@@ -2,7 +2,9 @@ using Parte3;
 
 PrintHeader();
 RunL4Tests();
+RunL4Interactive();
 RunIncrementerTests();
+RunIncrementerInteractive();
 
 static void PrintHeader()
 {
@@ -13,52 +15,71 @@ static void PrintHeader()
     Console.WriteLine();
 }
 
+// ── MT 1: L4 ────────────────────────────────────────────────────────────────
+
 static void RunL4Tests()
 {
     Console.WriteLine("--- MT 1: Reconhecedor de L4 = { a^n b^n c^n | n >= 1 } ---");
     Console.WriteLine();
 
     var mt = BuildL4Recognizer();
+    var inputs = File.ReadAllLines("entradas_l4.txt");
 
-    Console.WriteLine("Trace passo a passo para \"abc\":");
-    mt.Run("abc", (step, state, tape, head) =>
+    var first = inputs[0];
+    Console.WriteLine($"Trace passo a passo para \"{first}\":");
+    mt.Run(first, (step, state, tape, head) =>
         Console.WriteLine($"  Passo {step,2} | estado: {state,-9} | cab: {head,2} | fita: {tape}"));
     Console.WriteLine();
 
-    Console.WriteLine("Resumo dos casos de teste:");
-    var cases = new (string Input, bool Expected)[]
-    {
-        ("abc",       true),
-        ("aabbcc",    true),
-        ("aaabbbccc", true),
-        ("",          false),
-        ("a",         false),
-        ("ab",        false),
-        ("aabbc",     false),
-        ("aabbccc",   false),
-        ("ba",        false),
-        ("abbc",      false),
-    };
-
-    foreach (var (input, expected) in cases)
-        PrintL4Result(mt, input, expected);
+    Console.WriteLine("Resultados:");
+    foreach (var line in inputs)
+        PrintL4Result(mt, line);
 
     Console.WriteLine();
 }
 
-static void PrintL4Result(TuringMachine mt, string input, bool expected)
+static void RunL4Interactive()
+{
+    var mt = BuildL4Recognizer();
+
+    Console.WriteLine("--- MT 1: Modo interativo (Enter para sair) ---");
+    Console.WriteLine("  Alfabeto de entrada: { a, b, c }");
+    Console.WriteLine();
+
+    while (true)
+    {
+        Console.Write("  Cadeia: ");
+        var input = Console.ReadLine() ?? "";
+
+        if (input.Length == 0)
+            break;
+
+        if (!input.All(c => c is 'a' or 'b' or 'c'))
+        {
+            Console.WriteLine("  Entrada invalida: use apenas os simbolos { a, b, c }");
+            Console.WriteLine();
+            continue;
+        }
+
+        PrintL4Result(mt, input);
+        Console.WriteLine();
+    }
+
+    Console.WriteLine();
+}
+
+static void PrintL4Result(TuringMachine mt, string input)
 {
     var display = input.Length == 0 ? "(vazio)" : input;
     try
     {
         var result = mt.Run(input);
         var verdict = result.Accepted ? "ACEITA" : "REJEITA";
-        var ok = result.Accepted == expected ? "[OK]  " : "[FAIL]";
-        Console.WriteLine($"{ok} \"{display,-12}\" => {verdict,-8} ({result.StepsExecuted} passos)");
+        Console.WriteLine($"  \"{display,-12}\" => {verdict,-8} ({result.StepsExecuted} passos)");
     }
     catch (StepLimitExceededException ex)
     {
-        Console.WriteLine($"[ERR] \"{display,-12}\" => {ex.Message}");
+        Console.WriteLine($"  \"{display,-12}\" => ERRO: {ex.Message}");
     }
 }
 
@@ -98,38 +119,72 @@ static TuringMachine BuildL4Recognizer()
     return new TuringMachine(t, "q0", "qaccept", "qreject");
 }
 
+// ── MT 2: Incrementador ──────────────────────────────────────────────────────
+
 static void RunIncrementerTests()
 {
     Console.WriteLine("--- MT 2: Incrementador Unario f(n) = n + 1 ---");
     Console.WriteLine();
 
     var mt = BuildUnaryIncrementer();
+    var inputs = File.ReadAllLines("entradas_inc.txt");
 
-    Console.WriteLine("Trace passo a passo para \"111\":");
-    mt.Run("111", (step, state, tape, head) =>
+    var first = inputs[0];
+    Console.WriteLine($"Trace passo a passo para \"{first}\":");
+    mt.Run(first, (step, state, tape, head) =>
         Console.WriteLine($"  Passo {step,2} | estado: {state,-9} | cab: {head,2} | fita: {tape}"));
     Console.WriteLine();
 
-    Console.WriteLine("Resumo dos casos de teste:");
-    var cases = new (string Input, int ExpectedOnes)[]
-    {
-        ("1",    2),
-        ("11",   3),
-        ("111",  4),
-        ("1111", 5),
-        ("",     1),
-    };
+    Console.WriteLine("Resultados:");
+    foreach (var line in inputs)
+        PrintIncResult(mt, line);
 
-    foreach (var (input, expectedOnes) in cases)
+    Console.WriteLine();
+}
+
+static void RunIncrementerInteractive()
+{
+    var mt = BuildUnaryIncrementer();
+
+    Console.WriteLine("--- MT 2: Modo interativo (Enter para sair) ---");
+    Console.WriteLine("  Alfabeto de entrada: { 1 }");
+    Console.WriteLine();
+
+    while (true)
     {
-        var display = input.Length == 0 ? "(vazio)" : input;
-        var result = mt.Run(input);
-        var actualOnes = result.FinalTapeContent.Count(c => c == '1');
-        var ok = actualOnes == expectedOnes ? "[OK]  " : "[FAIL]";
-        Console.WriteLine($"{ok} f({input.Length}) = {actualOnes}  fita: [{result.FinalTapeContent}]  ({result.StepsExecuted} passos)");
+        Console.Write("  Cadeia: ");
+        var input = Console.ReadLine() ?? "";
+
+        if (input.Length == 0)
+            break;
+
+        if (!input.All(c => c == '1'))
+        {
+            Console.WriteLine("  Entrada invalida: use apenas o simbolo { 1 }");
+            Console.WriteLine();
+            continue;
+        }
+
+        PrintIncResult(mt, input);
+        Console.WriteLine();
     }
 
     Console.WriteLine();
+}
+
+static void PrintIncResult(TuringMachine mt, string input)
+{
+    var display = input.Length == 0 ? "(vazio)" : input;
+    try
+    {
+        var result = mt.Run(input);
+        var ones = result.FinalTapeContent.Count(c => c == '1');
+        Console.WriteLine($"  f({input.Length}) = {ones}  fita: [{result.FinalTapeContent}]  ({result.StepsExecuted} passos)");
+    }
+    catch (StepLimitExceededException ex)
+    {
+        Console.WriteLine($"  \"{display}\" => ERRO: {ex.Message}");
+    }
 }
 
 static TuringMachine BuildUnaryIncrementer()
