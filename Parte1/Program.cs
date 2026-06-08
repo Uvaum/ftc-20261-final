@@ -91,22 +91,20 @@ string caminhoJson = "afd.json";
 if (!File.Exists(caminhoJson))
 {
     Console.WriteLine($"[INFO] Arquivo '{caminhoJson}' não encontrado. Criando exemplo padrão (AFD para L1)...");
-    string jsonPadrao = """
-    {
-      "estados": ["q0", "q1", "q2"],
-      "alfabeto": ["a", "b"],
-      "estadoInicial": "q0",
-      "estadosAceitacao": ["q2"],
-      "transicoes": [
-        { "origem": "q0", "simbolo": "a", "destino": "q1" },
-        { "origem": "q0", "simbolo": "b", "destino": "q0" },
-        { "origem": "q1", "simbolo": "a", "destino": "q1" },
-        { "origem": "q1", "simbolo": "b", "destino": "q2" },
-        { "origem": "q2", "simbolo": "a", "destino": "q1" },
-        { "origem": "q2", "simbolo": "b", "destino": "q0" }
-      ]
-    }
-    """;
+    string jsonPadrao = @"{
+  ""estados"": [""q0"", ""q1"", ""q2""],
+  ""alfabeto"": [""a"", ""b""],
+  ""estadoInicial"": ""q0"",
+  ""estadosAceitacao"": [""q2""],
+  ""transicoes"": [
+    { ""origem"": ""q0"", ""simbolo"": ""a"", ""destino"": ""q1"" },
+    { ""origem"": ""q0"", ""simbolo"": ""b"", ""destino"": ""q0"" },
+    { ""origem"": ""q1"", ""simbolo"": ""a"", ""destino"": ""q1"" },
+    { ""origem"": ""q1"", ""simbolo"": ""b"", ""destino"": ""q2"" },
+    { ""origem"": ""q2"", ""simbolo"": ""a"", ""destino"": ""q1"" },
+    { ""origem"": ""q2"", ""simbolo"": ""b"", ""destino"": ""q0"" }
+  ]
+}";
     File.WriteAllText(caminhoJson, jsonPadrao);
     Console.WriteLine($"[INFO] Arquivo '{caminhoJson}' criado.");
     Console.WriteLine();
