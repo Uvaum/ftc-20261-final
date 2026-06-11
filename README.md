@@ -133,4 +133,5 @@ Arquivos de entrada: `Parte3/entradas_l4.txt`, `Parte3/entradas_inc.txt`
 ---
 
 ## Video de defesa
+[Assista ao vídeo](https://youtu.be/kE8u4uJCwCA)
 
